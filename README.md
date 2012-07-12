@@ -11,3 +11,7 @@ The output presumes that `natbib` and `amssym` and friends are within reach.
 ## License
 
 Copyright Christopher Brown 2011-2012, MIT Licensed
+
+## Acknowledgements
+
+Developed while typesetting for [Semantics & Pragmatics](http://semprag.org/), (http://semprag.org/).
