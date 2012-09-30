@@ -95,13 +95,19 @@ class Document
     @ignore_styles = false
 
     Zip::ZipFile.open(docx_filepath) do |docx_zip|
+      docx_zip.each { |entry| puts entry.name }
+
       footnotes_xml = docx_zip.read('word/footnotes.xml')
       footnotes_doc = XML::Document.string(footnotes_xml)
       @footnotes = read_notes(footnotes_doc)
 
-      endnotes_xml = docx_zip.read('word/endnotes.xml')
-      endnotes_doc = XML::Document.string(endnotes_xml)
-      @endnotes = read_notes(endnotes_doc)
+      begin
+        endnotes_xml = docx_zip.read('word/endnotes.xml')
+        endnotes_doc = XML::Document.string(endnotes_xml)
+        @endnotes = read_notes(endnotes_doc)
+      rescue
+        @endnotes = {}
+      end
 
       document_xml = docx_zip.read('word/document.xml')
       document_doc = XML::Document.string(document_xml)

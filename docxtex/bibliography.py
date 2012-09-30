@@ -1,14 +1,15 @@
+# -*- coding: utf-8 -*-
 # MIT Licensed, (c) 2011 Christopher Brown
 
-re_authors = r'(?<authors>.+?)\s*(?<editor>\(ed(itor)?s\.?\)\s+)?\s*'
-re_editors = r'(?<editor>.+?)\s*\(ed(itor)?s?\.?\)\s*'
-re_year = r'\((?<year>(\d{4}\w?/?)+)\)\s*'
-re_title = r'(?<title>[^.]+)\.\s*'
-re_title_i = r'\\\\emph\{(?<title>.+?)\}[.,]?\s*'
-re_journal = r'\\\\emph\{(?<journal>.+?)\}\.?\s*'
-re_page = r'(?<page_begin>\d+)-(?<page_end>\d+)'
-re_vol = r'((Volume)?\s*(?<volume>\d+(\.\d+)?):?\s*' + re_page + ')?'
-re_pub_address = r'(?<publisher>[^,]+)([.,]|, (?<address>.*[^.])[.,]?)\s*'
+re_authors = '(?<authors>.+?)\s*(?<editor>\(ed(itor)?s\.?\)\s+)?\s*'
+re_editors = '(?<editor>.+?)\s*\(ed(itor)?s?\.?\)\s*'
+re_year = '\((?<year>(\d{4}\w?/?)+)\)\s*'
+re_title = '(?<title>[^.]+)\.\s*'
+re_title_i = '\\\\emph\{(?<title>.+?)\}[.,]?\s*'
+re_journal = '\\\\emph\{(?<journal>.+?)\}\.?\s*'
+re_page = '(?<page_begin>\d+)-(?<page_end>\d+)'
+re_vol = '((Volume)?\s*(?<volume>\d+(\.\d+)?):?\s*' + re_page + ')?'
+re_pub_address = '(?<publisher>[^,]+)([.,]|, (?<address>.*[^.])[.,]?)\s*'
 
 BIB_REGEXES = [
   # Berman, Steve (1991) \emph{On the Semantics and Logical Form of Wh-Clauses}. Ph.D. dissertation, University of Massachusetts at Amherst.
