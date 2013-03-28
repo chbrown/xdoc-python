@@ -16,13 +16,13 @@ def main():
     tex_path = args.docx.replace('docx', 'tex')  # args.tex or
     bib_path = args.docx.replace('docx', 'bib')  # args.bib or
 
-    print '%s -> %s, %s' % (args.docx, tex_path, bib_path)
+    print 'Converting %s -> %s, %s' % (args.docx, tex_path, bib_path)
     document = parse_docx(args.docx)
     # print document
     # print unicode(document).encode('utf8')
 
     with open(tex_path, 'w') as tex_fp:
-        doc_bytes = unicode(document).encode('utf8')
+        doc_bytes = document.tex(True, True).encode('utf8')
         print doc_bytes
         tex_fp.write(doc_bytes)
     # with open(bib_path, 'w') as bib_fp:

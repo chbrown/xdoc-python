@@ -16,6 +16,10 @@ char_map = [
     (u"ü", r"\"u"),
     (u"Ø", r'\O'),
 
+    # double acute
+    (u"ő", r'\H{o}'),
+    (u"ű", r'\H{u}'),
+
     (u'∧', r'$\wedge$'),
     (u'∨', r'$\vee$'),
     (u'∀', r'$\forall$'),
@@ -80,6 +84,7 @@ char_translations = dict((ord(raw), unicode(tex)) for raw, tex in char_map)
 
 symbols = [
     ('F022', r'$\forall$'),
+    ('F023', r'\#'),
     ('F024', r'$\exists$'),
     ('F0CE', r'$\in$'),
     ('F0B9', r'$\neq$'),
@@ -100,6 +105,7 @@ symbols = [
     ('F0C8', r'$\cup$'),
     ('F0C7', r'$\cap$'),
     ('F0CF', r'$\nin$'),
+    ('F0BB', r'$\approx$'),
 ]
 symbols_lookup = dict((k, v) for k, v in symbols)
 
