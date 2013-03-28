@@ -1,8 +1,38 @@
-## docx->tex
+## docx2tex
 
-Here are few files I've been using to bootstrap the TeX-ification of various Word documents. I use Word to convert from .doc to .docx, if the document is not already a .docx, then just save as normal, and run something like the following:
+Steps to bootstrap the TeX-ification of Microsoft Word documents:
 
-    ruby -Ku parse.rb -d original.docx
+1. Use Word to convert from .doc to .docx, if the document is not already a .docx.
+2. Install `pip`, if you don't have it already:
+
+````bash
+easy_install pip
+````
+
+3. And then install directly from the repository:
+
+````bash
+pip install -e git://github.com/chbrown/docx-tex.git#egg=docxtex
+````
+
+4. Or install from source:
+
+````bash
+git clone git://github.com/chbrown/docx-tex.git
+cd docx-tex
+python setup.py install
+````
+
+5. Cool. It should be installed, so you should have the main script, `docx2tex`, on your `PATH`.
+6. To run it, go and find your docx file.
+
+````bash
+docx2tex original.docx
+````
+
+7. The script will output to `original.tex` and `original.bib` in the same file.
+
+## Results:
 
 It's rough, and still needs a lot of work, but it's better than copy & pasting.
 
@@ -10,61 +40,12 @@ The output presumes that `natbib` and `amssym` and friends are within reach.
 
 ## Dependencies:
 
-    gem install libxml-ruby
+    pip install lxml
 
 ## License
 
-Copyright Christopher Brown 2011-2012, MIT Licensed
+Copyright Christopher Brown 2011-2013, MIT Licensed
 
 ## Acknowledgements
 
 Developed while typesetting for [Semantics and Pragmatics](http://semprag.org/) (http://semprag.org/).
-
-
-
-# class String
-#     def apply_gsubs(sub_pairs)
-#         sub_pairs.inject(self) { |str, pair| str.gsub(pair[0], pair[1]) }
-#     end
-# end
-
-# class Array
-#     def filter
-#         self.compact.reject(&:empty?)
-#     end
-# end
-
-
-        first_span = p_sequence.spans[0]
-        if first_span
-            first_fragment = first_span.fragments[0]
-
-            if /^\s*§(\d+\.?\d*\.?\d*\.?\d*\.?)\s*(.*)$/.match(first_fragment)
-                # $1 refers to the ^ or \textbf{, $2 refers to the original (sub)section numbering, $3 refers to the (sub)section title
-                # contents.gsub!(/(^|^\\textbf\{)(\d+\.?\d*\.?\d*)\s*(.*)$/, '\subsubsection{\1\3} % \2')
-                # must be first w:r of the w:p
-                numbering = $1.chomp('.')
-                section_text = $2
-                subs = 'sub' * numbering.scan(/\./).length
-                "\\#{subs}section{#{section_text}} \\label{sec:#{numbering}}"
-            # elsif p_node.find_first("w:pPr/w:numPr[@w:val='1']") and !ignore_numPr
-            #     text = "\\begin{exe}\n\\ex[]{\\label{#{@example_counter}}#{text}}\n\\end{exe}\n"
-            #     @example_counter += 1
-            #     text
-            elsif /^\((\d+)\)$/.match(first_fragment)
-                # collapse_spans(spans.drop(1)).map { |span| span.to_s(@ignore_styles) }.join
-                @example_counter += 1
-                '''
-                \\begin{exe}
-                    \\ex[]{\\label{ex:#{$1}}
-                        #{p_sequence}
-                    }
-                \\end{exe}
-                '''
-                else
-                    p_sequence.to_s
-                end
-            else
-                ''
-            end
-        end
