@@ -39,7 +39,7 @@ The output presumes that `natbib` and `amssym` and friends are within reach.
 
 ## License
 
-Copyright © 2011-2013 Christopher Brown. [MIT Licensed](LICENSE).
+Copyright (c) 2011-2013 Christopher Brown. [MIT Licensed](LICENSE).
 
 
 ## Acknowledgements
