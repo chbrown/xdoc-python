@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
-from os import path
-here = path.abspath(path.dirname(__file__))
+
+import os
+here = os.path.dirname(__file__) or os.curdir
 
 setup(
     name='docxtex',
