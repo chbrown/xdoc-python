@@ -8,8 +8,7 @@ Steps to bootstrap the TeX-ification of Microsoft Word documents:
         easy_install pip
 
 3. And then install directly from the repository:
-    
-        
+
         pip install -e git://github.com/chbrown/docx-tex.git#egg=docxtex
 
 4. Or install from source:
@@ -25,19 +24,23 @@ Steps to bootstrap the TeX-ification of Microsoft Word documents:
 
 7. The script will output to `original.tex` and `original.bib` in the same file.
 
+
 ## Results:
 
 It's rough, and still needs a lot of work, but it's better than copy & pasting.
 
 The output presumes that `natbib` and `amssym` and friends are within reach.
 
+
 ## Dependencies:
 
     pip install lxml
 
+
 ## License
 
-Copyright Christopher Brown 2011-2013, MIT Licensed
+Copyright © 2011-2013 Christopher Brown. [MIT Licensed](LICENSE).
+
 
 ## Acknowledgements
 
