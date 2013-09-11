@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# MIT Licensed, (c) 2011 Christopher Brown
 import re
 
 re_authors = '(?<authors>.+?)\s*(?<editor>\(ed(itor)?s\.?\)\s+)?\s*'

@@ -1,25 +1,21 @@
-# -*- coding: utf-8 -*-
-# MIT Licensed, (c) 2011 Christopher Brown
 import argparse
 from microsoft import parse_docx
 
 
 def main():
-    #  [-t word.tex] [-b word.bib]
     parser = argparse.ArgumentParser(description='Usage: docx2tex word.docx')
-    parser.add_argument('docx', help='Docx file')
+    parser.add_argument('docx', help='Word document file')
+    #  [-t word.tex] [-b word.bib]
     # parser.add_argument('-t', '--tex', type=str, help='TeX output')
     # parser.add_argument('-b', '--bib',  type=str, help='BibTeX output')
     # parser.add_argument('--template', action='store_true')
-    args = parser.parse_args()
+    opts = parser.parse_args()
 
-    tex_path = args.docx.replace('docx', 'tex')  # args.tex or
-    bib_path = args.docx.replace('docx', 'bib')  # args.bib or
+    tex_path = opts.docx.replace('docx', 'tex')  # opts.tex or
+    bib_path = opts.docx.replace('docx', 'bib')  # opts.bib or
 
-    print 'Converting %s -> %s, %s' % (args.docx, tex_path, bib_path)
-    document = parse_docx(args.docx)
-    # print document
-    # print unicode(document).encode('utf8')
+    print 'Converting %s -> %s, %s' % (opts.docx, tex_path, bib_path)
+    document = parse_docx(opts.docx)
 
     with open(tex_path, 'w') as tex_fp:
         doc_bytes = document.tex(True, True).encode('utf8')
@@ -27,6 +23,7 @@ def main():
         tex_fp.write(doc_bytes)
     # with open(bib_path, 'w') as bib_fp:
     #     bib_fp.write(document.bibtex().encode('utf8'))
+
 
 if __name__ == '__main__':
     main()

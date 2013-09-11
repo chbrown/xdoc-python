@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# MIT Licensed, (c) 2011 Christopher Brown
 import re
-# from characters import char_syms, char_subs, string_subs
 from StringIO import StringIO
+# from characters import char_syms, char_subs, string_subs
 # from bib import *    # BibItem
 
 

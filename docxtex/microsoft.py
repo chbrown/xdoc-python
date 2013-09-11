@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# MIT Licensed, (c) 2011 Christopher Brown
 import zipfile
 import re
 import itertools
