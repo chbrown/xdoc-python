@@ -1,15 +1,13 @@
 import re
-from StringIO import StringIO
-# from characters import char_syms, char_subs, string_subs
-# from bib import *    # BibItem
 
 
 def undent(string):
     lines = string.strip().split('\n')
+    # first line doesn't really count
     indents = [len(re.match(r'\s*', line).group(0)) for line in lines[1:] if line]
     indent = min(indents)
     return '\n'.join(lines[:1] + [line[indent:] for line in lines[1:]])
 
 
-def pipeUTF(ascii):
-    return StringIO(ascii.read().decode('utf-8'))
+def empty(string):
+    return string == '' or string.isspace()

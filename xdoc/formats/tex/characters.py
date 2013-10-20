@@ -1,23 +1,37 @@
 # -*- coding: utf-8 -*-
 
-char_map = [
+# a useful reference for many of the different types of accents
+# http://en.wikibooks.org/wiki/LaTeX/Special_Characters#Escaped_codes
+escape_pairs = [
     (u'\\', r'\backslash{}'),
     (u'{', r'\{'),
     (u'}', r'\}'),  # these need to be first!
     (u'$', r'\$'),
+    (u'#', r'\#'),
 
-    (u"á", r"\'a"),
-    (u"é", r"\'e"),
-    (u"í", r"\'i"),
-    (u"ó", r"\'o"),
-    (u"ú", r"\'u"),
-    (u"ö", r"\"o"),
-    (u"ü", r"\"u"),
-    (u"Ø", r'\O'),
-
+    # acute
+    (u'á', r'\'a'),
+    (u'é', r'\'e'),
+    (u'í', r'\'i'),
+    (u'ó', r'\'o'),
+    (u'ú', r'\'u'),
     # double acute
-    (u"ő", r'\H{o}'),
-    (u"ű", r'\H{u}'),
+    (u'ő', r'\H{o}'),
+    (u'ű', r'\H{u}'),
+    # grave
+    (u'ò', r'\`{o}'),
+    # umlaut
+    (u'ö', r'\"o'),
+    (u'ü', r'\"u'),
+    # circumflex
+    (u'ô', r'\^{o}'),
+    # breve
+    (u'ŏ', r'\u{o}'),
+    # caron / hacek (little v)
+    (u'č', r'\v{c}'),
+
+    (u'ø', r'\o'),
+    (u'Ø', r'\O'),
 
     (u'∧', r'$\wedge$'),
     (u'∨', r'$\vee$'),
@@ -64,8 +78,10 @@ char_map = [
 
     (u'◊', r'$\lozenge$'),
 
-    (u"\t", r"\t"),
+    (u'\t', r'\hspace{4em}'),
+    (u'⇐', r'$\Leftarrow$'),
     (u'⇔', r'$\Leftrightarrow$'),
+    (u'⇒', r'$\Rightarrow$'),
     (u'→', r'$\to$'),
 
     (u'&', r'\&'),
@@ -73,41 +89,15 @@ char_map = [
     (u'–', r'--'),  # n-dash
     (u'∞', r'$\infty$'),  # n-dash
     (u'☐', r'$\square$'),
+    (u'\xa0', r'\ '),  # non-breaking space
 
     (u'', r'\{'),
     (u'', r'|'),
     (u'', r'$>$'),
     (u'%', r'\%'),
 ]
-char_translations = dict((ord(raw), unicode(tex)) for raw, tex in char_map)
+escape_translations = dict((ord(raw), unicode(tex)) for raw, tex in escape_pairs)
 
-symbols = [
-    ('F022', r'$\forall$'),
-    ('F023', r'\#'),
-    ('F024', r'$\exists$'),
-    ('F0CE', r'$\in$'),
-    ('F0B9', r'$\neq$'),
-    ('F0D8', r'$\neg$'),
-    ('F06A', r'$\phi$'),
-    ('F050', r'$\Pi$'),
-    ('F0D9', r'$\wedge$'),
-    ('F0CB', r'$\nsubseteq$'),
-    ('F0CD', r'$\subseteq$'),
-    ('F0CA', r'$\superseteq$'),
-    ('F0E0', r'$\to$'),
-    ('F0DA', r'$\vee$'),
-    ('F0A7', r'\textsection{}'),
-    ('F0A3', r'$\leq$'),
-    ('F0DE', r'$\Rightarrow$'),
-    ('F0DB', r'$\Leftrightarrow$'),
-    ('F0C6', r'$\emptyset$'),
-    ('F0C8', r'$\cup$'),
-    ('F0C7', r'$\cap$'),
-    ('F0CF', r'$\nin$'),
-    ('F0BB', r'$\approx$'),
-]
-symbols_lookup = dict((k, v) for k, v in symbols)
 
-string_substitutions = [
-    (u'==>', r'$\Rightarrow$'),
-]
+def escape(string):
+    return string.translate(escape_translations)

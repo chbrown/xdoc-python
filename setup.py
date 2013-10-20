@@ -1,10 +1,7 @@
 from setuptools import setup, find_packages
 
-import os
-here = os.path.dirname(__file__) or os.curdir
-
 setup(
-    name='docxtex',
+    name='xdoc',
     version='0.4.1',
     author='Christopher Brown',
     author_email='io@henrian.com',
@@ -20,7 +17,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'docx2tex = docxtex.convert:main',
+            'xdoc = xdoc.cli:main',
         ],
     },
 )
