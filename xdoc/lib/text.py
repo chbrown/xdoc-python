@@ -7,7 +7,3 @@ def undent(string):
     indents = [len(re.match(r'\s*', line).group(0)) for line in lines[1:] if line]
     indent = min(indents)
     return '\n'.join(lines[:1] + [line[indent:] for line in lines[1:]])
-
-
-def empty(string):
-    return string == '' or string.isspace()

@@ -1,73 +1,67 @@
 import re
+from xdoc.dom import Author, Reference
 
-from xdoc.formats.tex import escape
-from xdoc.lib.base import object_ustr
-
-
-class Author(object_ustr):
-    def __init__(self, first_name, middle_name, last_name):
-        # 'Judy von Linseng' should have a last name of 'von Linseng', not 'Linseng'
-        self.first_name = first_name
-        self.middle_name = middle_name
-        self.last_name = last_name
-
-    @classmethod
-    def parse(cls, raw):
-        parts = re.split(r',\s*', raw, maxsplit=2)
-        # TODO: handle von-type last names
-        if len(parts) == 3:
-            return cls(parts[2], parts[1], parts[0])
-        elif len(parts) == 2:
-            return cls(parts[1], None, parts[0])
-        else:
-            raise Exception('One-part names are not yet handled')
-
-    def __unicode__(self):
-        return ' '.join(filter(None, [self.first_name, self.middle_name, self.last_name]))
+import logging
+logger = logging.getLogger(__name__)
 
 
-class BibItem(object_ustr):
-    '''\bibitem is what TeX inline bibliographies call each bibliographic entry'''
-    def __init__(self, medium, key, **attrs):
-        self.medium = medium
-        self.key = key
-        self.attrs = attrs
+def named(name, pattern):
+    return '\s*(?P<%s>%s)' % (name, pattern)
 
-    def __unicode__(self):
-        contents = [self.key] + ['%s = {%s}' % (key, escape(value)) for key, value in self.attrs.items()]
-        body = ',\n  '.join(contents)
-        return u'@%s{%s}' % (self.medium, body)
-
+anything = r'.*?'
+some = r'.+?'
+s = r'\s*'
+sep = r'\.'
+year = '\d{4}'
 
 # \((\d{4}\w?,?)+\)/
-re_authors = r'(?<authors>.+?)\s*(?<editor>\(ed(itor)?s\.?\)\s+)?\s*'
-re_editors = r'(?<editor>.+?)\s*\(ed(itor)?s?\.?\)\s*'
-re_year = r'\((?<year>(\d{4}\w?/?)+)\)\s*'
-re_title = r'(?<title>[^.]+)\.\s*'
-re_title_i = r'\\emph\{(?<title>.+?)\}[.,]?\s*'
-re_journal = r'\\emph\{(?<journal>.+?)\}\.?\s*'
-re_page = r'(?<page_begin>\d+)-(?<page_end>\d+)'
-re_vol = r'((Volume)?\s*(?<volume>\d+(\.\d+)?):?\s*' + re_page + ')?'
-re_pub_address = r'(?<publisher>[^,]+)([.,]|, (?<address>.*[^.])[.,]?)\s*'
+# re_authors = r'(?P<authors>.+?)\s*'
+# re_authors_editors = r'(?P<authors>.+?)\s*(?P<editor>\(ed(itor)?s\.?\)\s+)?\s*'
+re_editors = r'(?P<editor>.+?)\s*\(ed(itor)?s?\.?\)\s*'
+# re_year = r'\((?P<year>\)\s*'
+re_title = r'(?P<title>[^.]+)\.\s*'
+re_title_i = r'(?P<title>.+?)[.,]?\s*'
+# re_journal = r'(?P<journal>.+?)\.?\s*'
+re_page = r'(?P<page_begin>\d+)-(?P<page_end>\d+)'
+re_vol = r'((Volume)?\s*(?P<volume>\d+(\.\d+)?):?\s*' + re_page + ')?'
+re_pub_address = r'(?P<publisher>[^,]+)([.,]|, (?P<address>.*[^.])[.,]?)\s*'
 
 
 media_regex = [{
     # Berman, Steve (1991) \emph{On the Semantics and Logical Form of Wh-Clauses}. Ph.D. dissertation, University of Massachusetts at Amherst.
     'medium': 'phdthesis',
-    'pattern': re_authors + re_year + re_title_i + 'Ph.D. dissertation, (?<school>.+)\.'
+    'pattern':
+        named('authors', some) + sep +
+        named('year', year) + sep +
+        named('title', some) + sep +
+        anything + 'dissertation,?' +
+        named('school', some)
 }, {
     # von , Kai (1995) A minimal theory of adverbial quantification. Ms., MIT, Cambridge, MA.
     'medium': 'unpublished',
-    'pattern': re_authors + re_year + re_title + 'Ms\., ' + re_pub_address,
-    'defaults': dict(note='Manuscript'),
+    'defaults': dict(note=u'Manuscript'),
+    'pattern':
+        named('authors', some) + sep +
+        named('year', year) + sep +
+        named('title', some) + sep +
+        '(ms|manuscript|unpublished),' + re_pub_address,
 }, {
     # Beckman, Mary E., and Janet Pierrehumbert (1986) Intonational structure in Japanese and English. \emph{Phonology Yearbook} 3:15-70.
     'medium': 'article',
-    'pattern': re_authors + re_year + re_title + re_journal + re_vol,
+    'pattern':
+        named('authors', some) + sep +
+        named('year', year) + sep +
+        named('title', some) + sep +
+        named('journal', some) + re_vol
+
 }, {
     # Bratman, Michael E. (1987) \emph{Intentions, Plans, and Practical Reason}. Harvard University Press, Cambridge, MA.
     'medium': 'book',
-    'pattern': re_authors + re_year + re_title_i + re_pub_address,
+    'pattern':
+        named('authors', some) + sep +
+        named('year', year) + sep +
+        named('title', some) + sep +
+        re_pub_address
 }, {
     # B\"uring, Daniel (1994) Topic. In Bosch & van der Sandt (1994), Volume 2: 271-280.
     'medium': '...?',
@@ -76,35 +70,52 @@ media_regex = [{
     # Krifka, Manfred (1992) A compositional semantics for multiple focus constructions.  In Joachim Jacobs (ed.) \emph{Informationsstruktur und Grammatik}. Westdeutscher Verlag, Weisbaden, Germany, 17-53.
     # Roberts, Craige (1995b) Anaphora in intensional contexts. In Shalom Lappin (ed.) \emph{Handbook of Semantics}. Blackwell, London.
     'medium': 'inbook',
-    'pattern': re_authors + re_year + re_title + 'In ' + re_editors + re_title_i + re_pub_address + '(' + re_page + ')?',
+    'pattern':
+        named('authors', some) + sep +
+        named('year', year) + sep +
+        named('title', some) + sep +
+        'In ' +
+        named('editors', some) + sep +
+        named('booktitle', some) + sep +
+        re_pub_address + '(' + re_page + ')?',
 }, {
     'medium': 'article',
-    'pattern': re_authors + re_year + '.*' + '\\emph\{(?<title>.+?)\}' + '.*',
-    'defaults': dict(note='FIXME'),
+    'defaults': dict(note=u'FIXME'),
+    'pattern':
+        named('authors', some) + sep +
+        named('year', year) + sep +
+        anything +
+        named('title', some)
 }]
 
 
-def parse_bib_items(text):
-    # given a raw (unformatted) string of bibliographic-like entries
-    # parse out the contents and medium of each one
+def parse_string(text):
+    # given a raw (unformatted) string that contains some number of bibliographic-like entries
+    #   parse the fields in each one (and the medium based on the regex that matches)
+    # yields Reference objects
     for medium_regex in media_regex:
-        for match in re.finditer(medium_regex['pattern'], text):
+        logger.silly('Testing regex: %s', medium_regex)
+        match = re.match(medium_regex['pattern'], text)
+
+        if match:
+            logger.debug('Using medium_regex "%s" to parse reference "%s"', medium_regex, text)
             groups = match.groupdict()
 
             authors_strings = groups.pop('authors').split(r',?\s*?(?:\band\b|&)')
-            authors = [Author.parse(author) for author in authors_strings]
+            authors = [Author.from_string(author) for author in authors_strings]
 
-            last_names = '-'.join(author.last_name.lowercase() for author in authors)
-            key = '%s:%s' % (last_names, groups['year'])
+            last_names = '-'.join(author.last_name.lower() for author in authors)
 
             attrs = medium_regex.get('defaults', {}).copy()
-            attrs['author'] = ' and '.join(authors)
+            attrs['author'] = ' and '.join(map(unicode, authors))
 
             page_begin, page_end = groups.pop('page_begin', None), groups.pop('page_end', None)
             if page_begin and page_end:
                 attrs['pages'] = '%s--%s' % (page_begin, page_end)
 
             # maybe filter to only the groups that have non-empty values?
-            attrs.update(groups)
+            for field, value in groups.items():
+                if value:
+                    attrs[field] = value
 
-            yield BibItem(medium_regex['medium'], key, **attrs)
+            yield Reference('%s:%s' % (last_names, groups['year']), medium_regex['medium'], **attrs)

@@ -1,10 +1,10 @@
 '''In this module, parse_ functions return things, read_ functions yield things'''
 import re
 import zipfile
-from xdoc.formats.docx.characters import symbol_map
 from lxml import etree
 
-from xdoc.document import Document, Span
+from xdoc.dom import Document, Span
+from xdoc.formats.docx.characters import symbol_map
 
 import logging
 logger = logging.getLogger(__name__)
@@ -139,11 +139,11 @@ def read_r(r, p_styles, p_attrs):
                 logger.silly('Ignoring fldCharType=separate')
             elif field_signal == 'end':
                 change = child.find('{*}numberingChange')
-                print 'numberingChange', change
+                # print 'numberingChange', change
                 if change is not None:
                     original = change.get(w_('original'))
                     yield Span(unicode(original), r_styles | p_styles, **p_attrs)
-                logger.debug('Found fldCharType=end; reverting p_styles and p_attrs')
+                logger.silly('Found fldCharType=end; reverting p_styles and p_attrs')
                 p_styles.clear()
                 p_attrs.clear()
             else:
@@ -184,7 +184,7 @@ def read_docx_notes(notes_fp, notes_path):
     for note in root.iterfind(notes_path):
         note_id = note.get(w_('id'))
         spans = [span for p in note.iterfind('{*}p') for span in read_p(p)]
-        logger.debug('Reading *note: %s=%s', note_id, spans)
+        logger.silly('Reading *note: %s=%s', note_id, spans)
         yield note_id, spans
 
 
@@ -193,13 +193,11 @@ def read_docx_document(document_fp):
     root = etree.parse(document_fp)
     for body in root.iterfind('//{*}body'):
         for p in body.iterfind('{*}p'):
-            # Do we really want this spacer? or just more structure inside the document?
-            yield Span(u'\n', set())
-
             for span in read_p(p):
                 yield span
 
-            yield Span(u'\n', set())
+            # Do we really want this spacer? or just more structure inside the document?
+            yield Span(u'', set(['break']))
 
 
 def parse_docx(docx_fp):
@@ -218,7 +216,7 @@ def parse_docx(docx_fp):
 
     def read_docx_document_merged():
         for span in read_docx_document(document_fp):
-            logger.debug('Reading span > %s', span)
+            logger.silly('Reading span > %s', span)
             # interpolate footnotes and endnotes as a sort of postprocessing step here
             if isinstance(span, DocxFootnote):
                 logger.debug('Resolving reference to footnote=%s', span.note_id)

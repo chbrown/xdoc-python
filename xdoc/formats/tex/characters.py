@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import logging
+logger = logging.getLogger(__name__)
+
 
 # a useful reference for many of the different types of accents
 # http://en.wikibooks.org/wiki/LaTeX/Special_Characters#Escaped_codes
@@ -100,4 +103,5 @@ escape_translations = dict((ord(raw), unicode(tex)) for raw, tex in escape_pairs
 
 
 def escape(string):
+    logger.debug('Escaping: %r', string)
     return string.translate(escape_translations)

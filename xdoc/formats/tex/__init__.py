@@ -28,6 +28,28 @@ simple_commands = {
 }
 
 
+def serialize_reference(reference):
+    '''
+    \\bibitem is what TeX inline bibliographies call each bibliographic entry
+
+    returns a string
+    '''
+    contents = [reference.key] + ['%s = {%s}' % (field, escape(value)) for field, value in reference.attrs.items()]
+    body = ',\n  '.join(contents)
+    # author_re = bib_item.lastnames.join(' (?:and|&) ').gsub("\\", "\\\\\\\\")
+    # regexes = {
+    #     citet:         Regexp.new(author_re + '\s*\((\d{4}\w?,?\s*)+\)'),
+    #     posscitet: Regexp.new(author_re + '\'s \s*\((\d{4}\w?,?\s*)+\)'),
+    #     citep:         Regexp.new('\(' + author_re + ',?\s*(\d{4}\w?,?\s*)+\)'),
+    #     citealt:     Regexp.new(author_re + ',?\s*(\d{4}\w?,?\s*)+')
+    # }
+    # regexes.each do |key, regex|
+    #     @tex = @tex.gsub(regex) do |match|
+    #         refs = $1.split(',').map { |year| bib_item.ref_lastnames + ":" + year }.join(',')
+    #         "\\#{key}{#{refs}}"
+    return u'@%s{%s}' % (reference.medium, body)
+
+
 def serialize_document(document):
     '''
     Converts the spans in a document into a bunch of strings
@@ -48,6 +70,8 @@ def serialize_document(document):
             # handle the more common styles first:
             if style in simple_commands:
                 yield simple_commands[style]
+            elif style == 'break':
+                yield u'\n\n'
             elif style == 'hyperlink':
                 yield r'\href{%s}' % span.attrs['url']
             elif style == 'counter':
@@ -88,6 +112,8 @@ def write(tex_fp, bib_fp, document):
 
     # export the bibliography
     logger.debug('Writing bib document to file: %s', bib_fp)
-    for key, item in document.bibliography.items():
-        logger.debug('NOT Writing %s -> %s to bibliography', key, item)
-        bib_fp.write(item)
+    for reference in document.references:
+        logger.debug('Serializing reference: %s', reference)
+        bibitem_string = serialize_reference(reference)
+        logger.debug('Writing to bibliography: %s', bibitem_string)
+        bib_fp.write(bibitem_string)

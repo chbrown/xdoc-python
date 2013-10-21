@@ -1,18 +1,24 @@
-'''An ad-hoc DOM of sorts'''
+import re
 import itertools
 import copy
 
 from xdoc.lib.base import object_ustr
-from xdoc.lib.text import empty
 
 
 class Document(object_ustr):
+    '''
+    The D in DOM
+
+    `metadata` is for things like author, title, date, etc.,
+        that might be printed on each page (in headers/footers)
+
+    `spans` are the meat of the document
+    `bibliography` is a list of References
+    '''
     def __init__(self, spans=None, **metadata):
-        # metadata is for things like author, title, date, etc.,
-        #   that might be printed on each page (in headers/footers)
         self.spans = spans or []
         self.metadata = metadata
-        self.bibliography = dict()
+        self.references = []
 
     def normalize(self):
         '''
@@ -31,7 +37,7 @@ class Document(object_ustr):
         outer_spans = []
         current_styles = set()
         for span in self.spans:
-            if empty(span.text):
+            if span.empty():
                 outer_spans.append(span)
             elif span.styles == current_styles:
                 # a non-empty span with identical styles triggers:
@@ -56,8 +62,8 @@ class Document(object_ustr):
         self.spans = [Span.merge(span_group) for styles, span_group in span_group_iter]
 
     def __unicode__(self):
-        return u'Document(metadata=%s, bibliography=%s, spans=%s)' % (
-            self.metadata, self.bibliography, u''.join(self.spans))
+        return u'Document(metadata=%s, references=%s, spans=%s)' % (
+            self.metadata, self.references, u''.join(self.spans))
 
 
 class Span(object_ustr):
@@ -79,8 +85,49 @@ class Span(object_ustr):
     def __unicode__(self):
         return u'Span(%r, styles=%s, attrs=%s)' % (self.text, self.styles, self.attrs)
 
+    def empty(self):
+        # the 'break' style check is kind of arbitrary
+        return 'break' not in self.styles and (self.text == '' or self.text.isspace())
+
     @classmethod
     def merge(cls, spans):
         first = next(spans)
         spans = itertools.chain([first], spans)
         return cls(''.join(span.text for span in spans), styles=first.styles, **first.attrs)
+
+
+class Author(object_ustr):
+    '''
+    Author: model for a single person with a last name, a first and last name, or first, middle, and last names.
+
+    "Judy von Linseng" should have a last name of "von Linseng", not "Linseng"
+    '''
+    def __init__(self, first_name, middle_name, last_name):
+        self.first_name = first_name
+        self.middle_name = middle_name
+        self.last_name = last_name
+
+    @classmethod
+    def from_string(cls, string):
+        parts = re.split(r',\s*', string, maxsplit=2)
+        # TODO: handle von-type last names
+        if len(parts) == 3:
+            return cls(parts[2], parts[1], parts[0])
+        elif len(parts) == 2:
+            return cls(parts[1], None, parts[0])
+        else:
+            raise Exception('One-part names are not yet handled: "%s"' % string)
+
+    def __unicode__(self):
+        return ' '.join(filter(None, [self.first_name, self.middle_name, self.last_name]))
+
+
+class Reference(object_ustr):
+    '''Yes, the choice of attributes is biased toward TeX, so sue me.'''
+    def __init__(self, key, medium, **attrs):
+        self.key = key
+        self.medium = medium
+        self.attrs = attrs
+
+    def __unicode__(self):
+        return '%s (%s): %s' % (self.key, self.medium, self.attrs)
