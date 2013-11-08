@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='xdoc',
-    version='0.4.1',
+    version='0.4.2',
     author='Christopher Brown',
     author_email='io@henrian.com',
     url='http://henrian.com',
