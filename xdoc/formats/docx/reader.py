@@ -98,8 +98,10 @@ def read_r(r, p_styles, p_attrs):
         elif child_tag == 'sym':
             char = child.get(w_('char'))
             # symbol_map maps from ascii to unicode
-            replacement = symbol_map.get(char, 'XXX: MISSING SYMBOL %r' % char)
-            logger.debug('Reading sym=%s: "%s"', char, replacement)
+            replacement = symbol_map.get(char)
+            if replacement is None:
+                logger.critical('Could not find symbol in map: %r' % char)
+            logger.silly('Reading sym=%s: "%s"', char, replacement)
             yield Span(replacement, r_styles | p_styles, **p_attrs)
         elif child_tag == 't':
             yield Span(unicode(child.text), r_styles | p_styles, **p_attrs)
@@ -197,7 +199,7 @@ def read_docx_document(document_fp):
                 yield span
 
             # Do we really want this spacer? or just more structure inside the document?
-            yield Span(u'', set(['break']))
+            yield Span(u'\n\n', frozenset())
 
 
 def parse_docx(docx_fp):

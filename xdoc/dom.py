@@ -37,7 +37,8 @@ class Document(object_ustr):
         outer_spans = []
         current_styles = set()
         for span in self.spans:
-            if span.empty():
+            # we only want spans that are empty / only whitespace, and have mutable styles
+            if span.empty() and not isinstance(span.styles, frozenset):
                 outer_spans.append(span)
             elif span.styles == current_styles:
                 # a non-empty span with identical styles triggers:
@@ -63,12 +64,14 @@ class Document(object_ustr):
 
     def __unicode__(self):
         return u'Document(metadata=%s, references=%s, spans=%s)' % (
-            self.metadata, self.references, u''.join(self.spans))
+            self.metadata, self.references, u', '.join(map(unicode, self.spans)))
 
 
 class Span(object_ustr):
     '''
     The primary building block of a Document
+
+    A (Paragraph)Break is just a Span, but with a value of styles that is an empty frozenset.
 
     A Hyperlink is just a Span, except that 'hyperlink' should always be an element of its `styles` set,
     and it also has a `url` field that designates the target url (the `text` field is the display text).
@@ -86,8 +89,7 @@ class Span(object_ustr):
         return u'Span(%r, styles=%s, attrs=%s)' % (self.text, self.styles, self.attrs)
 
     def empty(self):
-        # the 'break' style check is kind of arbitrary
-        return 'break' not in self.styles and (self.text == '' or self.text.isspace())
+        return self.text == '' or self.text.isspace()
 
     @classmethod
     def merge(cls, spans):

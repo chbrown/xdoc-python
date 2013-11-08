@@ -60,18 +60,18 @@ def serialize_document(document):
     # current_styles tracks what styles are currently applied
     current_styles = set()
     for span in document.spans:
-        logger.silly('escaping: %r', span.text)
-
         pop_styles, push_styles, current_styles = set_diff(current_styles, span.styles)
+        # logger.debug('popping styles: %r', pop_styles)
         for style in pop_styles:
             yield '}'
 
+        logger.silly('escaping: %r (pop ) (>>', span.text)
+
+        # logger.debug('pushing styles: %r', push_styles)
         for style in push_styles:
             # handle the more common styles first:
             if style in simple_commands:
                 yield simple_commands[style]
-            elif style == 'break':
-                yield u'\n\n'
             elif style == 'hyperlink':
                 yield r'\href{%s}' % span.attrs['url']
             elif style == 'counter':
@@ -103,7 +103,7 @@ def write(tex_fp, bib_fp, document):
     tex_string = auto.references(tex_string)
     tex_string = auto.spaces(tex_string)
 
-    # embed the document body in template
+    # embed the document body into our template
     timestamp = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     tex_string = document_template % dict(body=tex_string, timestamp=timestamp)
 

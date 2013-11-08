@@ -103,5 +103,5 @@ escape_translations = dict((ord(raw), unicode(tex)) for raw, tex in escape_pairs
 
 
 def escape(string):
-    logger.debug('Escaping: %r', string)
+    logger.debug('Escaping: "%s"', string.encode('utf8'))
     return string.translate(escape_translations)
