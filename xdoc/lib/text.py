@@ -1,6 +1,10 @@
 import re
 
 
+def utf8str(s):
+    return s.encode('utf8') if s else s
+
+
 def undent(string):
     lines = string.strip().split('\n')
     # first line doesn't really count

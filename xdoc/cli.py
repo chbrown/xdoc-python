@@ -1,37 +1,13 @@
+import sys
 import os
 import argparse
-import logging
-logging.addLevelName(5, 'SILLY')
+
+from xdoc.lib.log import logging
 
 
-class Logger(logging.Logger):
-    def silly(self, msg, *args, **kwargs):
-        level = logging.getLevelName('SILLY')
-        if self.isEnabledFor(level):
-            self._log(level, msg, args, **kwargs)
-
-    def notset(self, msg, *args, **kwargs):
-        level = logging.getLevelName('NOTSET')
-        if self.isEnabledFor(level):
-            self._log(level, msg, args, **kwargs)
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description='Usage: xdoc original.docx converted.tex',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('input', help='Input filename')
-    parser.add_argument('output', help='Output filename')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Log extra output')
+def translate(parser):
     opts = parser.parse_args()
-
-    # max(map(len, [logging.getLevelName(level) for level in range(0, 60, 10)])) == 8
-    level = logging.DEBUG if opts.verbose else logging.INFO
-    logging.basicConfig(format='%(levelname)-8s %(asctime)14s (%(name)s): %(message)s', level=level)
-    logging.setLoggerClass(Logger)
     logger = logging.getLogger(__name__)
-    logger.info('Logging with level >= %s (%s)', logging.root.level, logging.getLevelName(logging.root.level))
 
     # read input
     input_root, input_extension = os.path.splitext(opts.input)
@@ -57,5 +33,60 @@ def main():
                 write(tex_fp, bib_fp, document)
     else:
         raise NotImplementedError('File extension "%s" not supported as output' % output_extension)
+
+
+def parsebib(parser):
+    opts = parser.parse_args()
+    logger = logging.getLogger(__name__)
+
+    from xdoc.bibliography import crossref_lookup
+    from xdoc.formats.tex import serialize_reference
+
+    input = sys.stdin if (opts.input == '-') else open(opts.input)
+    output = sys.stdout if (opts.output == '-') else open(opts.output)
+
+    for line in input:
+        line = line.strip().decode('utf8')
+        logger.info('Resolving "%s" via CrossRef API', line)
+
+        for bibitem in crossref_lookup(line):
+            print >> output, serialize_reference(bibitem)
+            break
+        else:
+            logger.error('FIXME: could not parse bib item: %s', line)
+
+    # import unicodedata
+    # crf = train_crf()
+        # if line:
+            # strip tex if needed (only simple commands; if there are environments, too bad)
+            # line = tex_command.sub(line, 'a\1z')
+            # line = re.sub(r'\\[a-z]+\{([^\}]+)\}', r'\1', line)
+
+            # tokens = unidecode(line).split()
+            # features = [list(token_features(token)) for token in tokens]
+            # labels = crf.predict(features)
+            # pairs = zip(tokens, labels)
+            # print gloss.gloss(pairs, prefixes=('', Fore.GREEN), postfixes=(Fore.RESET, Fore.RESET), groupsep='\n')
+
+actions = dict(translate=translate, parsebib=parsebib)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Usage: xdoc original.docx converted.tex',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    # parser.add_argument('input', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
+    parser.add_argument('input', help='input filename')
+    # parser.add_argument('output', nargs='?', type=argparse.FileType('w'), default=sys.stdout)
+    parser.add_argument('output', help='output filename')
+    parser.add_argument('-a', '--action', choices=actions, default='translate', help='xdoc action')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Log extra output')
+    opts = parser.parse_args()
+
+    logging.root.setLevel(logging.DEBUG if opts.verbose else logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.info('Logging with level >= %s (%s)', logging.root.level, logging.getLevelName(logging.root.level))
+
+    actions[opts.action](parser)
 
     logger.debug('Done')

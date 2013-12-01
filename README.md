@@ -25,9 +25,13 @@ It's rough, and still needs a lot of work, but it's better than copy & pasting.
 The output presumes that `natbib` and `amssym` and friends are within reach.
 
 
-## Dependencies:
+## Development
 
-    easy_install -U lxml
+### TODO:
+
+* Shrink whitespace left from the right edge (non-greedy)
+* Handle styles in footnotes without breaking the footnote due to unstyled whitespace
+* Read tabs that are surrounded by text at least as single spaces.
 
 
 ## License

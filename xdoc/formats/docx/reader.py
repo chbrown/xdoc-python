@@ -141,7 +141,6 @@ def read_r(r, p_styles, p_attrs):
                 logger.silly('Ignoring fldCharType=separate')
             elif field_signal == 'end':
                 change = child.find('{*}numberingChange')
-                # print 'numberingChange', change
                 if change is not None:
                     original = change.get(w_('original'))
                     yield Span(unicode(original), r_styles | p_styles, **p_attrs)
@@ -172,7 +171,7 @@ def read_p(p):
         elif p_child_tag == 'hyperlink':
             # hyperlinks are just wrappers around a single w:r that contains a w:t.
             # you can use the w:hyperlink[@r:id] value and _rels/document.xml.rels to resolve it,
-            # but for now I just print the raw link.
+            # but for now I just read the raw link
             for hyperlink_child in p_child:
                 for span in read_r(hyperlink_child, p_styles, p_attrs):
                     yield span

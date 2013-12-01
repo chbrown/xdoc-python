@@ -1,4 +1,4 @@
-from xdoc.bibliography import parse_string
+from xdoc.bibliography import crossref_lookup
 from xdoc.formats.docx.reader import parse_docx
 import itertools
 
@@ -27,7 +27,7 @@ def read(docx_fp):
             p_spans = list(p_spans)
             p_text = ''.join(span.text for span in p_spans)
             logger.debug('Parsing reference: %s', p_text)
-            references = list(parse_string(p_text))
+            references = list(crossref_lookup(p_text))
             if len(references):
                 # consider the paragraphs consumed
                 for span in p_spans:

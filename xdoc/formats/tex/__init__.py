@@ -1,4 +1,5 @@
 from datetime import datetime
+# from xdoc.dom import Document, Span
 from xdoc.formats.tex.characters import escape
 from xdoc.formats.tex import auto
 from xdoc.lib import set_diff
@@ -47,7 +48,7 @@ def serialize_reference(reference):
     #     @tex = @tex.gsub(regex) do |match|
     #         refs = $1.split(',').map { |year| bib_item.ref_lastnames + ":" + year }.join(',')
     #         "\\#{key}{#{refs}}"
-    return u'@%s{%s}' % (reference.medium, body)
+    return u'@%s{%s\n}' % (reference.medium, body)
 
 
 def serialize_document(document):

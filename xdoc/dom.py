@@ -3,6 +3,7 @@ import itertools
 import copy
 
 from xdoc.lib.base import object_ustr
+from xdoc.lib.regex import named, maybe, anything, some, s, space, sep, end
 
 
 class Document(object_ustr):
@@ -10,7 +11,7 @@ class Document(object_ustr):
     The D in DOM
 
     `metadata` is for things like author, title, date, etc.,
-        that might be printed on each page (in headers/footers)
+        that might appear on each page (in headers/footers)
 
     `spans` are the meat of the document
     `bibliography` is a list of References
@@ -111,14 +112,23 @@ class Author(object_ustr):
 
     @classmethod
     def from_string(cls, string):
-        parts = re.split(r',\s*', string, maxsplit=2)
-        # TODO: handle von-type last names
-        if len(parts) == 3:
-            return cls(parts[2], parts[1], parts[0])
-        elif len(parts) == 2:
-            return cls(parts[1], None, parts[0])
-        else:
-            raise Exception('One-part names are not yet handled: "%s"' % string)
+        first = named('first', some)
+        middle = named('middle', some)
+        last = named('last', some)
+
+        patterns = [
+            last + ',\s+' + first + '\s+' + middle + end,  # Auden, Wystan Hugh
+            last + ',\s+' + first + end,  # Auden, Wystan
+            first + '\s+' + middle + '\s+' + last + end,  # Wystan Hugh Auden
+            first + '\s+' + last + end,  # Wystan Auden
+        ]
+        for pattern in patterns:
+            match = re.match(pattern, string)
+            if match:
+                groups = match.groupdict()
+                return cls(groups['first'], groups.get('middle'), groups['last'])
+
+        raise Exception('Cannot parse name: "%s"' % string)
 
     def __unicode__(self):
         return ' '.join(filter(None, [self.first_name, self.middle_name, self.last_name]))
