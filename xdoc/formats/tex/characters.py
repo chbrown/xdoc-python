@@ -32,6 +32,9 @@ escape_pairs = [
     (u'ŏ', r'\u{o}'),
     # caron / hacek (little v)
     (u'č', r'\v{c}'),
+    # combining accents
+    (u'̈', r'\"'), # diaeresis
+    (u'́', r'\''), # acute
 
     (u'ø', r'\o'),
     (u'Ø', r'\O'),
@@ -53,6 +56,13 @@ escape_pairs = [
     (u'∅', r'$\emptyset$'),
     (u'ø', r'$\emptyset$'),
     (u'', r'$\cap$'),
+    (u'−', r'$-$'), # 'MINUS SIGN' (U+2212)
+    (u'⊑', r'$\sqsubseteq$'), # 'SQUARE IMAGE OF OR EQUAL TO' (U+2291)
+    (u'⊃', r'$\supset$'),
+    (u'⊂', r'$\subset$'),
+    (u'≡', r'$\equiv$'),
+    (u'≥', r'$\ge$'),
+
 
     (u'‘', r'`'),
     (u'’', r"'"),
@@ -78,6 +88,9 @@ escape_pairs = [
     (u'', r' '),
     (u'', r'$\pi$'),
     (u'', r','),
+    (u'µ', r'$\mu$'),
+    (u'μ', r'$\mu$'),
+    (u'τ', r'$\tau$'),
 
     (u'◊', r'$\lozenge$'),
 
@@ -93,6 +106,8 @@ escape_pairs = [
     (u'∞', r'$\infty$'),  # n-dash
     (u'☐', r'$\square$'),
     (u'\xa0', r'\ '),  # non-breaking space
+    # ligatures
+    (u'ﬁ', 'fi'),
 
     (u'', r'\{'),
     (u'', r'|'),
