@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 document_template = r'''\documentclass[10pt]{report}
 \usepackage{times}
+%%\usepackage{supersub} %% uncomment to use naked super/sub- scripts
 
 %% Converted by xdoc on %(timestamp)s
 
