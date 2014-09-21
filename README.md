@@ -29,7 +29,9 @@ The output presumes that `natbib` and `amssym` and friends are within reach.
 
 ### TODO:
 
-* Shrink whitespace left from the right edge (non-greedy)
+* Shrink whitespace out of spans (non-greedy)
+  - E.g., `\emph{framework }that we` should be `\emph{framework} that we`
+* Cannot have math environments inside a naked sub/superscript.
 * Handle styles in footnotes without breaking the footnote due to unstyled whitespace
 * Read tabs that are surrounded by text at least as single spaces.
 

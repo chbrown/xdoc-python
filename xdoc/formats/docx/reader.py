@@ -101,7 +101,8 @@ def read_r(r, p_styles, p_attrs):
             replacement = symbol_map.get(char)
             if replacement is None:
                 logger.critical('Could not find symbol in map: %r' % char)
-            logger.silly('Reading sym=%s: "%s"', char, replacement)
+                replacement = u'MISSING SYMBOL (%r)' % char
+            logger.silly('Reading sym=%s as "%s"', char, replacement)
             yield Span(replacement, r_styles | p_styles, **p_attrs)
         elif child_tag == 't':
             yield Span(unicode(child.text), r_styles | p_styles, **p_attrs)

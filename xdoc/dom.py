@@ -82,6 +82,7 @@ class Span(object_ustr):
     It has an empty text value.
     '''
     def __init__(self, text, styles, **attrs):
+        assert text is not None, 'text must not be None'
         self.text = text
         self.styles = styles
         self.attrs = copy.deepcopy(attrs)
