@@ -22,6 +22,12 @@ def read(docx_fp):
         if 'bold' in span.styles and ('References' in span.text or 'Bibliography' in span.text):
             break
 
+    # document.references = list(read_bibliography(span_iter))
+
+    return document
+
+
+def read_bibliography(span_iter):
     for is_break, p_spans in itertools.groupby(span_iter, lambda span: 'break' in span.styles):
         if not is_break:
             p_spans = list(p_spans)
@@ -36,9 +42,8 @@ def read(docx_fp):
             else:
                 logger.debug('could not parse reference string: %s', p_text)
 
-            document.references += references
-
-    return document
+            for reference in references:
+                yield reference
 
 
 def write():
